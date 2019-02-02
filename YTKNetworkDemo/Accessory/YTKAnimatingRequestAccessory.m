@@ -41,7 +41,7 @@
     if (_animatingView) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // TODO: show loading
-            // [YTKAlertUtils showLoadingAlertView:_animatingText inView:_animatingView];
+//             [YTKAlertUtils showLoadingAlertView:_animatingText inView:_animatingView];
             NSLog(@" loading start");
         });
     }
@@ -50,8 +50,8 @@
 - (void)requestWillStop:(id)request {
     if (_animatingView) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            // TODO: hide loading
-            //[YTKAlertUtils hideLoadingAlertView:_animatingView];
+//             TODO: hide loading
+//            [YTKAlertUtils hideLoadingAlertView:_animatingView];
             NSLog(@" loading finished");
         });
     }

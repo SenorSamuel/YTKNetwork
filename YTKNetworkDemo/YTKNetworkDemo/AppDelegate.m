@@ -9,6 +9,8 @@
 #import "AppDelegate.h"
 #import "YTKNetworkConfig.h"
 #import "YTKUrlArgumentsFilter.h"
+#include <CommonCrypto/CommonDigest.h>
+#import <CommonCrypto/CommonCryptor.h>
 
 @interface AppDelegate ()
 
@@ -17,11 +19,37 @@
 @implementation AppDelegate
 
 - (void)setupRequestFilters {
-    NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+//    NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     YTKNetworkConfig *config = [YTKNetworkConfig sharedConfig];
-    YTKUrlArgumentsFilter *urlFilter = [YTKUrlArgumentsFilter filterWithArguments:@{@"version": appVersion}];
+    config.debugLogEnabled = YES;
+    config.baseUrl = @"https://gateway.marvel.com:443";
+    
+    NSString *tsString = [NSUUID UUID].UUIDString;
+    NSString *publicKey = @"d463e90161c9afc585f9224e6f53462f";
+    NSString *privateKey = @"a4533e4afeb131a138444e7ac841963b4ea480ed";
+    NSString *md5Hash = [self CT_MD5WithString:[NSString stringWithFormat:@"%@%@%@", tsString, privateKey, publicKey]];
+    YTKUrlArgumentsFilter *urlFilter = [YTKUrlArgumentsFilter filterWithArguments:@{@"apikey": @"d463e90161c9afc585f9224e6f53462f",
+                                                                                    @"ts":tsString,
+                                                                                    @"hash":md5Hash}];
     [config addUrlFilter:urlFilter];
 }
+
+
+- (NSString *)CT_MD5WithString:(NSString *)rawStr
+{
+    NSData* inputData = [rawStr dataUsingEncoding:NSUTF8StringEncoding];
+    unsigned char outputData[CC_MD5_DIGEST_LENGTH];
+    CC_MD5([inputData bytes], (unsigned int)[inputData length], outputData);
+    
+    NSMutableString* hashStr = [NSMutableString string];
+    int i = 0;
+    for (i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
+        [hashStr appendFormat:@"%02x", outputData[i]];
+    
+    return hashStr;
+}
+
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self setupRequestFilters];

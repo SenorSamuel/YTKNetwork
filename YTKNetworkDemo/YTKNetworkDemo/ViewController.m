@@ -13,8 +13,9 @@
 #import "GetUserInfoApi.h"
 #import "RegisterApi.h"
 #import "YTKBaseRequest+AnimatingAccessory.h"
+#import "MarvelApi.h"
 
-@interface ViewController ()<YTKChainRequestDelegate>
+@interface ViewController ()<YTKChainRequestDelegate,YTKRequestDelegate>
 
 @end
 
@@ -86,11 +87,33 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self sendMarvelRequest];
+
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+-(void)sendMarvelRequest{
+    
+    MarvelApi *marvelApi = [[MarvelApi alloc]initWithCharacterId:1011334];
+    marvelApi.animatingText = @"正在加载";
+    marvelApi.animatingView = self.view;
+    marvelApi.delegate = self;
+    [marvelApi start];
 }
+
+- (void)requestFinished:(__kindof YTKBaseRequest *)request{
+    NSLog(@"请求成功%@",request.responseString);
+}
+
+///  Tell the delegate that the request has failed.
+///
+///  @param request The corresponding request.
+- (void)requestFailed:(__kindof YTKBaseRequest *)request{
+    NSLog(@"请求失败%@",request);
+}
+
+
+
+
 
 @end
